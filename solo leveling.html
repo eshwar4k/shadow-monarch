@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Solo Leveling – MONARCH</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#eaffff;
+  font-family:Arial;
+  text-align:center;
+}
+h1{
+  color:#9efcff;
+  text-shadow:0 0 30px #9efcff;
+}
+.card{
+  background:#020f1c;
+  border:1px solid #9efcff;
+  box-shadow:0 0 25px #9efcff55;
+  padding:14px;
+  width:92%;
+  max-width:420px;
+  margin:12px auto;
+  border-radius:18px;
+}
+button{
+  width:95%;
+  padding:10px;
+  margin:6px;
+  font-size:15px;
+  background:linear-gradient(90deg,#9efcff,#2563eb);
+  border:none;
+  border-radius:14px;
+  font-weight:bold;
+}
+.progress{
+  background:#111;
+  height:18px;
+  border-radius:10px;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#9efcff,#2563eb);
+}
+.stat{display:flex;justify-content:space-between;}
+.small{font-size:12px;color:#bdefff;}
+.hidden{display:none;}
+.heat span{
+  display:inline-block;
+  width:14px;height:14px;
+  margin:2px;border-radius:4px;
+  background:#111;
+}
+.active{background:#00e5ff;}
+</style>
+</head>
+
+<body>
+
+<h1>👑 SHADOW MONARCH SYSTEM</h1>
+
+<div class="card">
+<p>Level <b id="lvl">1</b> | Rank <b id="rank">E</b></p>
+<p>Title: <b id="title">Awakened</b></p>
+<p>XP <span id="xp">0</span>/100</p>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<p>🔥 Streak <span id="streak">0</span> days</p>
+</div>
+
+<div class="card">
+<h3>Stats</h3>
+<div class="stat">Strength <span id="str">1</span></div>
+<div class="stat">Intelligence <span id="int">1</span></div>
+<div class="stat">Discipline <span id="dis">1</span></div>
+<div class="stat">Health <span id="hp">1</span></div>
+</div>
+
+<div class="card">
+<h3>Shadow Army (Daily Activities)</h3>
+<button onclick="act(20,'Study Soldier')">📘 Study (45 min)</button>
+<button onclick="act(15,'Workout Soldier')">🏃 Workout</button>
+<button onclick="act(15,'Skill Soldier')">🧠 Skill Practice</button>
+<button onclick="act(10,'No Phone Soldier')">No Phone (6'o Evening)</button>
+</div>
+
+
+<div class="card">
+<h3>Weekly Boss</h3>
+<p>👹 Boss: Laziness King</p>
+<button onclick="act(60,'Boss Defeated')">⚔️ Defeat Boss</button>
+</div>
+
+<div class="card">
+<h3>Calendar Proof</h3>
+<div class="heat" id="heat"></div>
+<p class="small">Blue = active day</p>
+</div>
+
+<div class="card hidden" id="levelup">
+<h3>LEVEL UP – Choose Stat</h3>
+<button onclick="inc('str')">Strength</button>
+<button onclick="inc('int')">Intelligence</button>
+<button onclick="inc('dis')">Discipline</button>
+<button onclick="inc('hp')">Health</button>
+</div>
+
+
+<script>
+let today=new Date().toDateString();
+
+let d=JSON.parse(localStorage.getItem("monarch"))||{
+xp:0,level:1,streak:0,last:"",
+stats:{str:1,int:1,dis:1,hp:1},
+days:[],lv:false,title:"Awakened"
+};
+
+if(d.last!==today){
+d.streak++;
+d.last=today;
+}
+
+function save(){localStorage.setItem("monarch",JSON.stringify(d));}
+
+function update(){
+xp.innerText=d.xp;
+lvl.innerText=d.level;
+bar.style.width=d.xp+"%";
+streak.innerText=d.streak;
+str.innerText=d.stats.str;
+int.innerText=d.stats.int;
+dis.innerText=d.stats.dis;
+hp.innerText=d.stats.hp;
+title.innerText=d.title;
+rank.innerText=d.level<6?"E":d.level<11?"D":d.level<21?"C":d.level<36?"B":d.level<50?"A":"S";
+levelup.classList.toggle("hidden",!d.lv);
+renderHeat();
+}
+
+function act(x,name){
+if(d.lv)return;
+d.xp+=x;
+if(!d.days.includes(today)) d.days.push(today);
+if(d.xp>=100){
+d.xp-=100;
+d.level++;
+d.lv=true;
+}
+checkTitle();
+save();update();
+}
+
+function inc(s){
+d.stats[s]++;
+d.lv=false;
+save();update();
+}
+
+function checkTitle(){
+if(d.level>=10) d.title="Shadow Commander";
+if(d.level>=25) d.title="Demon King";
+if(d.level>=40) d.title="SHADOW MONARCH";
+}
+
+function renderHeat(){
+heat.innerHTML="";
+for(let i=0;i<30;i++){
+let day=new Date(Date.now()-i*86400000).toDateString();
+let span=document.createElement("span");
+if(d.days.includes(day)) span.className="active";
+heat.appendChild(span);
+}
+}
+
+
+
+update();
+</script>
+
+</body>
+</html>
